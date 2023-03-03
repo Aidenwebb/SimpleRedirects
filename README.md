@@ -1,4 +1,8 @@
-# Simple Redirects app
+# Simple Redirects Web App
+
+[![SimpleRedirects Builds](https://github.com/Aidenwebb/SimpleRedirects/actions/workflows/build.yml/badge.svg)](https://github.com/Aidenwebb/SimpleRedirects/actions/workflows/build.yml)
+
+## Why?
 
 Initially created to work around a limitation of Azure Front Door, [where directing an Apex domain to Azure Front Door requires periodic rotating of _dnsauth TXT records][afd-cert-docs], which is not ideal when you may not have access to modify the DNS records regularly.
 
