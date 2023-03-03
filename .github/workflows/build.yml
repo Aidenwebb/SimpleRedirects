@@ -132,6 +132,105 @@ jobs:
           path: ${{ matrix.base_path }}/${{ matrix.project_name }}/${{ matrix.project_name }}.zip
           if-no-files-found: error
 
+  build-docker:
+    name: Build Docker images
+    runs-on: ubuntu-latest
+    needs: [build-artifacts]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project_name: Web
+            base_path: ./src
+            docker_repos: [aidenwebb]
+            dotnet: true
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check Branch to Publish
+        env:
+          PUBLISH_BRANCHES: "master,rc,hotfix-rc"
+        id: publish-branch-check
+        run: |
+          IFS=',' read -a publish_branches <<< $PUBLISH_BRANCHES
+
+          if [[ " ${publish_branches[*]} " =~ " ${GITHUB_REF:11} "]]; then
+            echo "is_publish_branch=true" >> $GITHUB_ENV
+          else
+            echo "is_publish_branch=false" >> $GITHUB_ENV
+          fi
+
+        #### ACRs ####
+
+      - name: Login to Docker Hub
+        if: env.is_publish_branch == 'true'
+        env:
+          DOCKER_USERNAME: "${{ secrets.DOCKER_USERNAME }}"
+          DOCKER_PASSWORD: "${{ secrets.DOCKER_PASSWORD }}"
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      - name: Generate Docker image tag
+        id: tag
+        run: |
+          IMAGE_TAG=$(echo "${GITHUB_REF:11}" | sed "s#/#-#g") # Slash safe branch name
+          if [[ "$IMAGE_TAGE" == "main" ]]; then
+            IMAGE_TAG=dev
+          elif [[ "$IMAGE_TAG" == "rc" ]] || [[ "$IMAGE_TAG" == "hotfix-rc" ]]; then
+            IMAGE_TAG=beta
+          fi
+
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Setup project name
+        id: setup
+        run: |
+          PROJECT_NAME=$(echo "${{ matrix.project_name }}" | awk '{print tolower($0)}')
+          echo "Matrix name: ${{ matrix.project_name }}"
+          echo "Project name: $PROJECT_NAME"       
+          echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Generate tag list
+        id: tag-list
+        env:
+          IMAGE_TAG: ${{ steps.tag.outputs.image_tag }}
+          PROJECT_NAME: ${{ steps.setup.outputs.project_name }}
+        run: echo "tags=aidenwebb/$PROJECT_NAME:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Get build artifact
+        if: ${{ matrix.dotnet }}
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.project_name }}.zip
+
+      - name: Setup build artifact
+        if: ${{ matrix.dotnet }}
+        run: |
+          mkdir -p ${{ matrix.base_path }}/${{ matrix.project_name }}/obj/build-output/publish
+          unzip ${{ matrix.project_name }}.zip -d ${{ matrix.base_path }}/${{ matrix.project_name }}/obj/build-output/publish
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ matrix.base_path }}/${{ matrix.project_name }}
+          file: ${{ matrix.base_path }}/${{ matrix.project_name }}/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.tag-list.outputs.tags }}
+
+      - name: Publish to DockerHub
+        if: contains(matrix.docker_repos, 'aidenwebb' && env.is_publish_branch == 'true')
+        env:
+          IMAGE_TAG: ${{ steps.tag.outputs.image_tag }}
+          PROJECT_NAME: ${{ steps.setup.outputs.project_name }}
+        run: |
+          docker tag aidenwebb/$PROJECT_NAME:$IMAGE_TAG
+          docker push aidenwebb/$PROJECT_NAME:$IMAGE_TAG
+
+      - name: Log out of Docker
+        run: |
+          docker logout
+
   check-failures:
     name: Check for failures
     if: always()
