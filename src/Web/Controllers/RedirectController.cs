@@ -12,8 +12,8 @@ public class RedirectController : Controller
         //Uri uri = new Uri();
         string http_scheme = Request.IsHttps ? "https://" : "http://";
         string fqdn = Request.Host.Value;
-        string path = Request.Path.Value;
-        string queryString = Request.QueryString.Value;
+        string? path = Request.Path.Value;
+        string? queryString = Request.QueryString.Value;
         
         string requestUri = http_scheme + fqdn + path + queryString;
 
