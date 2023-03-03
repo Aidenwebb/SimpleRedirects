@@ -29,8 +29,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install cloc
+
       - name: Count lines of code
-        uses: cloc --include-lang C# --vcs git
+        run: cloc --include-lang C# --vcs git
 
   lint:
     name: Lint
