@@ -13,11 +13,11 @@ public static class RedirectHandler
     {
         DomainParser parser = new DomainParser(new WebTldRuleProvider());
         DomainInfo domainInfo = parser.Parse(uri.Host);
-        
-            var builder = new UriBuilder(uri)
-            {
-                Host = "www." + domainInfo.RegistrableDomain
-            };
-            return builder.Uri;
+
+        var builder = new UriBuilder(uri)
+        {
+            Host = "www." + domainInfo.RegistrableDomain
+        };
+        return builder.Uri;
     }
 }

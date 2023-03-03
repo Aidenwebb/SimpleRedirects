@@ -14,12 +14,12 @@ public class RedirectController : Controller
         string fqdn = Request.Host.Value;
         string? path = Request.Path.Value;
         string? queryString = Request.QueryString.Value;
-        
+
         string requestUri = http_scheme + fqdn + path + queryString;
 
         Uri uri = new Uri(requestUri);
         Uri redirectionResult = RedirectHandler.RedirectToApexWww(uri);
-        
+
         return RedirectPermanent(redirectionResult.ToString());
     }
 }
