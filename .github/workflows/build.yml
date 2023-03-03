@@ -142,6 +142,11 @@ jobs:
       - testing
       - build-artifacts
     steps:
+      - name: Print environment
+        run: |
+          echo "Github ref: $GITHUB_REF"
+          echo "Github event: $GITHUB_EVENT"
+
       - name: Check if any job failed
         if: |
           github.ref == 'refs/heads/main'
@@ -171,4 +176,4 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          message: ${{ job.status }}
+          message: "${{ github.repository }} - Build Failure. Link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
