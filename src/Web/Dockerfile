@@ -1,20 +1,23 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 
+
+LABEL com.aidenwebb.product="simple-redirects"
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gosu \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["Web/Web.csproj", "Web/"]
-RUN dotnet restore "Web/Web.csproj"
-COPY . .
-WORKDIR "/src/Web"
-RUN dotnet build "Web.csproj" -c Release -o /app/build
+COPY ./obj/build-output/publish .
+COPY "/entrypoint.sh" / 
 
-FROM build AS publish
-RUN dotnet publish "Web.csproj" -c Release -o /app/publish
+RUN chmod +x /entrypoint.sh
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Web.dll"]
+# HEALTHCHECK CMD curl -f http://localhost/alive || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]
