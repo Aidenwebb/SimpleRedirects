@@ -131,3 +131,44 @@ jobs:
           name: ${{ matrix.project_name }}.zip
           path: ${{ matrix.base_path }}/${{ matrix.project_name }}/${{ matrix.project_name }}.zip
           if-no-files-found: error
+
+  check-failures:
+    name: Check for failures
+    if: always()
+    runs-on: ubuntu-latest
+    needs:
+      - cloc
+      - lint
+      - testing
+      - build-artifacts
+    steps:
+      - name: Check if any job failed
+        if: |
+          github.ref == 'refs/heads/main'
+          || github.ref == 'refs/heads/rc'
+          || github.ref == 'refs/heads/hotfix-rc'
+        env:
+          CLOC_STATUS: ${{ needs.cloc.result }}
+          LINT_STATUS: ${{ needs.lint.result }}
+          TESTING_STATUS: ${{ needs.testing.result }}
+          BUILD_ARTIFACTS_STATUS: ${{ needs.build-artifacts.result }}
+        run: |
+          if [ "$CLOC_STATUS" == "failure" ]; then
+            echo "CLOC failed"
+            exit 1
+          elif [ "$LINT_STATUS" == "failure" ]; then
+            echo "Lint failed"
+            exit 1
+          elif [ "$TESTING_STATUS" == "failure" ]; then
+            echo "Testing failed"
+            exit 1
+          elif [ "$BUILD_ARTIFACTS_STATUS" == "failure" ]; then
+            echo "Build artifacts failed"
+            exit 1
+          fi
+      - name: Notify Teams on Failure
+        uses: dhollerbach/actions.send-message-to-ms-teams@1.0.10
+        if: failure()
+        with:
+          webhook: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          message: ${{ job.status }}
