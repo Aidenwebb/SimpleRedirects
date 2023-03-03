@@ -1,0 +1,90 @@
+name: SimpleRedirects Builds
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build-Debug
+        run: dotnet build --no-restore --configuration Debug
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+
+  release:
+    name: Create GitHub Release
+    needs: [test]
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create Tag
+        id: create_tag
+        run: |
+          tag=$(basename "${{ github.ref }}")
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: Release ${{ steps.create_tag.outputs.tag }}
+          draft: true
+          prerelease: false
+
+  build:
+    name: Build Relesae
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Build-Release
+        run: dotnet build --no-restore --configuration Release
+      - name: Create Archive
+        run: tar -czf SimpleRedirects.tar.gz ./SimpleRedirects/bin/Release/net6.0/publish
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./SimpleRedirects.tar.gz
+          asset_name: SimpleRedirects.tar.gz
+          asset_content_type: application/gzip
+
+  metadata:
+    name: Publish Release
+    needs: [test, release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.release.outputs.release_id }}
+      - uses: eregon/keep-last-n-releases@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          n: 3
+          remove_tags_without_release: true
