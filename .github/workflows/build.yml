@@ -150,12 +150,12 @@ jobs:
 
       - name: Check Branch to Publish
         env:
-          PUBLISH_BRANCHES: "master,rc,hotfix-rc"
+          PUBLISH_BRANCHES: "main,rc,hotfix-rc"
         id: publish-branch-check
         run: |
           IFS=',' read -a publish_branches <<< $PUBLISH_BRANCHES
 
-          if [[ " ${publish_branches[*]} " =~ " ${GITHUB_REF:11} "]]; then
+          if [[ " ${publish_branches[*]} " =~ " ${GITHUB_REF:11} " ]]; then
             echo "is_publish_branch=true" >> $GITHUB_ENV
           else
             echo "is_publish_branch=false" >> $GITHUB_ENV
@@ -240,6 +240,7 @@ jobs:
       - lint
       - testing
       - build-artifacts
+      - build-docker
     steps:
       - name: Print environment
         run: |
@@ -256,6 +257,7 @@ jobs:
           LINT_STATUS: ${{ needs.lint.result }}
           TESTING_STATUS: ${{ needs.testing.result }}
           BUILD_ARTIFACTS_STATUS: ${{ needs.build-artifacts.result }}
+          BUILD_DOCKER_STATUS: ${{ needs.build-docker.result }}
         run: |
           if [ "$CLOC_STATUS" == "failure" ]; then
             echo "CLOC failed"
@@ -268,6 +270,9 @@ jobs:
             exit 1
           elif [ "$BUILD_ARTIFACTS_STATUS" == "failure" ]; then
             echo "Build artifacts failed"
+            exit 1
+          elif [ "$BUILD_DOCKER_STATUS" == "failure" ]; then
+            echo "Build docker failed"
             exit 1
           fi
       - name: Notify Teams on Failure
