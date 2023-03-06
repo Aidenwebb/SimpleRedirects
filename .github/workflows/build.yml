@@ -174,7 +174,7 @@ jobs:
         id: tag
         run: |
           IMAGE_TAG=$(echo "${GITHUB_REF:11}" | sed "s#/#-#g") # Slash safe branch name
-          if [[ "$IMAGE_TAGE" == "main" ]]; then
+          if [[ "$IMAGE_TAG" == "main" ]]; then
             IMAGE_TAG=dev
           elif [[ "$IMAGE_TAG" == "rc" ]] || [[ "$IMAGE_TAG" == "hotfix-rc" ]]; then
             IMAGE_TAG=beta
