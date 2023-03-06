@@ -17,9 +17,11 @@ on:
           - info
           - warning
           - debug
+
+env:
+  SOLUTION_NAME: SimpleRedirects
+
 jobs:
-  solution:
-    name: Simple-Redirects
   cloc:
     name: CLOC
     runs-on: ubuntu-latest
@@ -137,7 +139,7 @@ jobs:
   build-docker:
     name: Build Docker images
     runs-on: ubuntu-latest
-    needs: [build-artifacts, project]
+    needs: [build-artifacts]
     strategy:
       fail-fast: false
       matrix:
@@ -187,7 +189,7 @@ jobs:
       - name: Setup project name
         id: setup
         run: |
-          PROJECT_NAME=$(echo ${{ needs.solution.name }}-"${{ matrix.project_name }}" | awk '{print tolower($0)}')
+          PROJECT_NAME=$(echo $SOLUTION_NAME-"${{ matrix.project_name }}" | awk '{print tolower($0)}')
           echo "Matrix name: ${{ matrix.project_name }}"
           echo "Project name: $PROJECT_NAME"       
           echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
