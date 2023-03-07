@@ -1,15 +1,14 @@
 using AutoMapper;
 
-namespace SimpleRedirects.Data.DtoModels;
+namespace SimpleRedirects.Data.Models;
 
 public class User : Core.Entities.User
 {
-    
 }
 
-public class AppUserMapperProfile : Profile
+public class UserMapperProfile : Profile
 {
-    public AppUserMapperProfile()
+    public UserMapperProfile()
     {
         CreateMap<Core.Entities.User, User>().ReverseMap();
     }

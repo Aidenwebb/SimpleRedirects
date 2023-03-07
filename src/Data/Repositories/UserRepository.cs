@@ -2,27 +2,28 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleRedirects.Core.Entities;
+using SimpleRedirects.Core.Repositories;
 
 namespace SimpleRedirects.Data.Repositories;
 
-public class UserRepository : Repository<Core.Entities.User, User, Guid>, IUserRepository
+public class UserRepository : Repository<User, Models.User, Guid>, IUserRepository
 {
-    
     public UserRepository(IServiceScopeFactory serviceScopeFactory, IMapper mapper)
-        : base(serviceScopeFactory, mapper, (ApplicationDbContext context) => context.Users)
-    { }
-    
-    public async Task<Core.Entities.User> GetByEmailAsync(string email)
+        : base(serviceScopeFactory, mapper, context => context.Users)
+    {
+    }
+
+    public async Task<User> GetByEmailAsync(string email)
     {
         using (var scope = ServiceScopeFactory.CreateScope())
         {
             var dbContext = GetDatabaseContext(scope);
             var entity = await GetDbSet(dbContext).FirstOrDefaultAsync(e => e.Email == email);
-            return Mapper.Map<Core.Entities.User>(entity);
+            return Mapper.Map<User>(entity);
         }
     }
-    
-    public async Task<IEnumerable<Core.Entities.User>> GetManyAsync(IEnumerable<Guid> ids)
+
+    public async Task<IEnumerable<User>> GetManyAsync(IEnumerable<Guid> ids)
     {
         using (var scope = ServiceScopeFactory.CreateScope())
         {
@@ -31,8 +32,8 @@ public class UserRepository : Repository<Core.Entities.User, User, Guid>, IUserR
             return await users.ToListAsync();
         }
     }
-    
-    public override async Task DeleteAsync(Core.Entities.User user)
+
+    public override async Task DeleteAsync(User user)
     {
         using (var scope = ServiceScopeFactory.CreateScope())
         {
@@ -40,13 +41,11 @@ public class UserRepository : Repository<Core.Entities.User, User, Guid>, IUserR
 
             var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            var mappedUser = Mapper.Map<User>(user);
+            var mappedUser = Mapper.Map<Models.User>(user);
             dbContext.Users.Remove(mappedUser);
 
             await transaction.CommitAsync();
             await dbContext.SaveChangesAsync();
         }
     }
-    
-    
 }

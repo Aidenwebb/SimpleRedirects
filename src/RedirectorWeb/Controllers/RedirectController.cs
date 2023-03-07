@@ -10,15 +10,15 @@ public class RedirectController : Controller
     public IActionResult Index()
     {
         //Uri uri = new Uri();
-        string http_scheme = Request.IsHttps ? "https://" : "http://";
-        string fqdn = Request.Host.Value;
-        string? path = Request.Path.Value;
-        string? queryString = Request.QueryString.Value;
+        var http_scheme = Request.IsHttps ? "https://" : "http://";
+        var fqdn = Request.Host.Value;
+        var path = Request.Path.Value;
+        var queryString = Request.QueryString.Value;
 
-        string requestUri = http_scheme + fqdn + path + queryString;
+        var requestUri = http_scheme + fqdn + path + queryString;
 
-        Uri uri = new Uri(requestUri);
-        Uri redirectionResult = RedirectHandler.RedirectToApexWww(uri);
+        var uri = new Uri(requestUri);
+        var redirectionResult = RedirectHandler.RedirectToApexWww(uri);
 
         return RedirectPermanent(redirectionResult.ToString());
     }

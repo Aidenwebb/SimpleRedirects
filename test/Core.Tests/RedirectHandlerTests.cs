@@ -1,20 +1,9 @@
 using SimpleRedirects.Core;
+
 namespace Core.Tests;
 
 public class RedirectHandlerTests
 {
-    [Fact]
-    public void RedirectToWww_Success()
-    {
-        Uri input = new Uri("https://example.com");
-        Uri expected = new Uri("https://www.example.com");
-
-        Uri actual = RedirectHandler.RedirectToApexWww(input);
-
-        Assert.Equal(expected, actual);
-
-    }
-
     public static IEnumerable<object[]> GenerateRedirectApexToWwwCases = new[]
     {
         new object[]
@@ -40,26 +29,36 @@ public class RedirectHandlerTests
         new object[]
         {
             new Uri("https://example.co.uk/test/123/page?name=ferret&colour=purple"), // Input Uri
-            new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple"), // Input Uri
+            new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple") // Input Uri
         },
         new object[]
         {
             new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple"), // Input Uri
-            new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple"), // Input Uri
+            new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple") // Input Uri
         },
         new object[]
         {
             new Uri("https://othersubdomain.example.co.uk/test/123/page?name=ferret&colour=purple"), // Input Uri
-            new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple"), // Input Uri
+            new Uri("https://www.example.co.uk/test/123/page?name=ferret&colour=purple") // Input Uri
         }
-
     };
+
+    [Fact]
+    public void RedirectToWww_Success()
+    {
+        var input = new Uri("https://example.com");
+        var expected = new Uri("https://www.example.com");
+
+        var actual = RedirectHandler.RedirectToApexWww(input);
+
+        Assert.Equal(expected, actual);
+    }
 
     [Theory]
     [MemberData(nameof(GenerateRedirectApexToWwwCases))]
     public void RedirectToWww_WithInputs_Success(Uri input, Uri expected)
     {
-        Uri actual = RedirectHandler.RedirectToApexWww(input);
+        var actual = RedirectHandler.RedirectToApexWww(input);
 
         Assert.Equal(expected, actual);
     }

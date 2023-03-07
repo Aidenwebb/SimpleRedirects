@@ -2,22 +2,22 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleRedirects.Core.Entities;
+using SimpleRedirects.Core.Repositories;
 
 namespace SimpleRedirects.Data.Repositories;
 
-public abstract class Repository<T, TEntity, TId> : BaseEntityFrameworkRepository, IRepository<T, TId> 
-    where TId : IEquatable<TId> 
-    where T : class, ITableObject<TId> 
+public abstract class Repository<T, TEntity, TId> : BaseEntityFrameworkRepository, IRepository<T, TId>
+    where TId : IEquatable<TId>
+    where T : class, ITableObject<TId>
     where TEntity : class, ITableObject<TId>
 {
-
     public Repository(IServiceScopeFactory serviceScopeFactory, IMapper mapper,
         Func<ApplicationDbContext, DbSet<TEntity>> getDbSet) : base(serviceScopeFactory, mapper)
     {
         GetDbSet = getDbSet;
     }
-    
-    protected Func<ApplicationDbContext, DbSet<TEntity>> GetDbSet { get; private set; }
+
+    protected Func<ApplicationDbContext, DbSet<TEntity>> GetDbSet { get; }
 
     public virtual async Task<T> GetByIdAsync(TId id)
     {
@@ -60,16 +60,12 @@ public abstract class Repository<T, TEntity, TId> : BaseEntityFrameworkRepositor
 
     public virtual async Task UpsertAsync(T obj)
     {
-        if (obj.Id.Equals(default(TId)))
-        {
+        if (obj.Id.Equals(default))
             await CreateAsync(obj);
-        }
         else
-        {
             await ReplaceAsync(obj);
-        }
     }
-    
+
     public virtual async Task DeleteAsync(T obj)
     {
         using (var scope = ServiceScopeFactory.CreateScope())
@@ -80,6 +76,7 @@ public abstract class Repository<T, TEntity, TId> : BaseEntityFrameworkRepositor
             await dbContext.SaveChangesAsync();
         }
     }
+
     public virtual async Task RefreshDb()
     {
         using (var scope = ServiceScopeFactory.CreateScope())
@@ -101,6 +98,7 @@ public abstract class Repository<T, TEntity, TId> : BaseEntityFrameworkRepositor
                 var entity = Mapper.Map<TEntity>(o);
                 entities.Add(entity);
             }
+
             var dbContext = GetDatabaseContext(scope);
             await GetDbSet(dbContext).AddRangeAsync(entities);
             await dbContext.SaveChangesAsync();

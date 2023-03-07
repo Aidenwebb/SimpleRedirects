@@ -1,4 +1,6 @@
-namespace SimpleRedirects.Core.Entities;
+using SimpleRedirects.Core.Entities;
+
+namespace SimpleRedirects.Core.Repositories;
 
 public interface IUserRepository : IRepository<User, Guid>
 {

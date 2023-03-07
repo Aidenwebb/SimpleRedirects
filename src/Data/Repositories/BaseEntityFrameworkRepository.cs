@@ -11,8 +11,8 @@ public abstract class BaseEntityFrameworkRepository
         Mapper = mapper;
     }
 
-    protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
-    protected IMapper Mapper { get; private set; }
+    protected IServiceScopeFactory ServiceScopeFactory { get; }
+    protected IMapper Mapper { get; }
 
     public ApplicationDbContext GetDatabaseContext(IServiceScope serviceScope)
     {
