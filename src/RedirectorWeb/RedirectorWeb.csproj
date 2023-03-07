@@ -5,8 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <RootNamespace>SimpleRedirects.Redirector</RootNamespace>
-        <AssemblyName>Redirector</AssemblyName>
+        <RootNamespace>SimpleRedirects.RedirectorWeb</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
