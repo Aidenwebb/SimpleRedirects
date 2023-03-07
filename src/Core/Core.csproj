@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="Nager.PublicSuffix" Version="2.4.0" />
+      <PackageReference Include="RT.Comb" Version="4.0.1" />
     </ItemGroup>
 
 </Project>
