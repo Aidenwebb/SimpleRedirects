@@ -1,7 +1,7 @@
-using SimpleRedirects.Core;
 using Microsoft.AspNetCore.Mvc;
+using SimpleRedirects.Core;
 
-namespace SimpleRedirects.Web.Controllers;
+namespace SimpleRedirects.Redirector.Controllers;
 
 public class RedirectController : Controller
 {

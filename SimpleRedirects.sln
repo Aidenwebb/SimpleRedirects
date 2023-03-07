@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "src\Web\Web.csproj", "{E2ABD126-9A89-4593-8A4C-4E383C6ABC6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedirectorWeb", "src\RedirectorWeb\RedirectorWeb.csproj", "{E2ABD126-9A89-4593-8A4C-4E383C6ABC6E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DAF0F902-EFF4-4A5B-B5C2-F84BB75139FA}"
 EndProject
