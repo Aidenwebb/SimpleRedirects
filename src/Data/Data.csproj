@@ -11,7 +11,6 @@
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
       <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.3" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.3">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,13 +25,10 @@
 
     <ItemGroup>
       <Reference Include="Microsoft.AspNetCore">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\6.0.14\ref\net6.0\Microsoft.AspNetCore.dll</HintPath>
+        <HintPath>..\..\..\..\..\..\..\..\..\usr\share\dotnet\shared\Microsoft.AspNetCore.App\7.0.3\Microsoft.AspNetCore.dll</HintPath>
       </Reference>
       <Reference Include="Microsoft.Extensions.Configuration">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\6.0.14\ref\net6.0\Microsoft.Extensions.Configuration.dll</HintPath>
-      </Reference>
-      <Reference Include="Microsoft.Extensions.Configuration.FileExtensions">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\6.0.14\ref\net6.0\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
+        <HintPath>..\..\..\..\..\..\..\..\..\usr\share\dotnet\shared\Microsoft.AspNetCore.App\7.0.3\Microsoft.Extensions.Configuration.dll</HintPath>
       </Reference>
     </ItemGroup>
 

@@ -1,16 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using Psa.Core.Utilities;
 
 namespace SimpleRedirects.Core.Entities;
 
-public class User : ITableObject<Guid>
+public class AppUser : IdentityUser<Guid>
 {
-    public Guid Id { get; set; }
-    [MaxLength(50)]
-    public string UserName { get; set; }
-    public byte[] PasswordHash { get; set; }
-    public byte[] PasswordSalt { get; set; }
-    
     public void SetNewId()
     {
         Id = CoreHelpers.GenerateComb();
