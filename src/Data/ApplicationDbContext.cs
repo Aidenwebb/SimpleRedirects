@@ -7,7 +7,7 @@ using SimpleRedirects.Data.Configurations;
 
 namespace SimpleRedirects.Data;
 
-public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>
+public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
